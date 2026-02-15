@@ -1,14 +1,22 @@
 {
   "name": "goey-native-toast",
   "version": "0.1.0",
-  "description": "React Native toast library",
-  "main": "./lib/module/index.js",
+  "description": "A lightweight, animated, and customizable toast library for React Native",
+  "main": "./lib/commonjs/index.js",
+  "module": "./lib/module/index.js",
   "types": "./lib/typescript/src/index.d.ts",
+  "react-native": "./src/index.tsx",
+  "source": "./src/index.tsx",
   "exports": {
     ".": {
-      "source": "./src/index.tsx",
-      "types": "./lib/typescript/src/index.d.ts",
-      "default": "./lib/module/index.js"
+      "import": {
+        "types": "./lib/typescript/src/index.d.ts",
+        "default": "./lib/module/index.js"
+      },
+      "require": {
+        "types": "./lib/typescript/src/index.d.ts",
+        "default": "./lib/commonjs/index.js"
+      }
     },
     "./package.json": "./package.json"
   },
@@ -37,24 +45,30 @@
     "prepare": "bob build",
     "typecheck": "tsc",
     "test": "jest",
-    "release": "release-it --only-version",
+    "release": "release-it",
     "lint": "eslint \"**/*.{js,ts,tsx}\""
   },
   "keywords": [
     "react-native",
     "ios",
-    "android"
+    "android",
+    "toast",
+    "notification",
+    "alert",
+    "snackbar",
+    "reanimated",
+    "ui",
+    "component"
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Goey/goey-native-toast.git"
+    "url": "git+https://github.com/Teepheh-Git/goey-native-toast.git"
   },
-  "author": "Goey <goey@example.com> (https://github.com/Goey)",
-  "license": "MIT",
+  "author": "Teepheh-Git (https://github.com/Teepheh-Git)",
   "bugs": {
-    "url": "https://github.com/Goey/goey-native-toast/issues"
+    "url": "https://github.com/Teepheh-Git/goey-native-toast/issues"
   },
-  "homepage": "https://github.com/Goey/goey-native-toast#readme",
+  "homepage": "https://github.com/Teepheh-Git/goey-native-toast#readme",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },
@@ -66,8 +80,10 @@
     "@react-native/babel-preset": "0.83.0",
     "@react-native/eslint-config": "0.83.0",
     "@release-it/conventional-changelog": "^10.0.1",
+    "@testing-library/react-native": "^13.3.3",
     "@types/jest": "^29.5.14",
     "@types/react": "^19.1.12",
+    "@types/react-test-renderer": "^19",
     "commitlint": "^19.8.1",
     "del-cli": "^6.0.0",
     "eslint": "^9.35.0",
@@ -79,28 +95,34 @@
     "react": "19.1.0",
     "react-native": "0.81.5",
     "react-native-builder-bob": "^0.40.18",
+    "react-native-gesture-handler": "^2.30.0",
+    "react-native-keyboard-controller": "^1.20.7",
+    "react-native-reanimated": "^4.2.1",
+    "react-native-safe-area-context": "^5.6.2",
+    "react-native-svg": "^15.15.3",
+    "react-test-renderer": "19.1.0",
     "release-it": "^19.0.4",
     "turbo": "^2.5.6",
     "typescript": "^5.9.2"
   },
   "peerDependencies": {
     "react": "*",
-    "react-native": "*"
+    "react-native": "*",
+    "react-native-gesture-handler": ">=2.0.0",
+    "react-native-keyboard-controller": ">=1.0.0",
+    "react-native-reanimated": ">=3.0.0",
+    "react-native-safe-area-context": ">=4.0.0",
+    "react-native-svg": ">=13.0.0"
   },
   "workspaces": [
     "example"
   ],
-  "packageManager": "yarn@4.11.0",
   "react-native-builder-bob": {
     "source": "src",
     "output": "lib",
     "targets": [
-      [
-        "module",
-        {
-          "esm": true
-        }
-      ],
+      "commonjs",
+      "module",
       [
         "typescript",
         {
@@ -108,54 +130,5 @@
         }
       ]
     ]
-  },
-  "jest": {
-    "preset": "react-native",
-    "modulePathIgnorePatterns": [
-      "<rootDir>/example/node_modules",
-      "<rootDir>/lib/"
-    ]
-  },
-  "commitlint": {
-    "extends": [
-      "@commitlint/config-conventional"
-    ]
-  },
-  "release-it": {
-    "git": {
-      "commitMessage": "chore: release ${version}",
-      "tagName": "v${version}"
-    },
-    "npm": {
-      "publish": true
-    },
-    "github": {
-      "release": true
-    },
-    "plugins": {
-      "@release-it/conventional-changelog": {
-        "preset": {
-          "name": "angular"
-        }
-      }
-    }
-  },
-  "prettier": {
-    "quoteProps": "consistent",
-    "singleQuote": true,
-    "tabWidth": 2,
-    "trailingComma": "es5",
-    "useTabs": false
-  },
-  "create-react-native-library": {
-    "type": "library",
-    "languages": "js",
-    "tools": [
-      "jest",
-      "lefthook",
-      "release-it",
-      "eslint"
-    ],
-    "version": "0.57.2"
   }
 }
