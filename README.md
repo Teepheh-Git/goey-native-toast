@@ -20,6 +20,37 @@ npm install goey-native-toast
 yarn add goey-native-toast
 ```
 
+### Expo Support
+
+This library is compatible with **Expo Development Builds** (Prebuild). It is **not** supported in Expo Go because it relies on `react-native-keyboard-controller`, which includes native code not present in the Expo Go client.
+
+To use it with Expo:
+
+1. Install the dependencies:
+   ```sh
+   npx expo install goey-native-toast react-native-reanimated react-native-gesture-handler react-native-svg react-native-safe-area-context react-native-keyboard-controller
+   ```
+
+2. Add the plugins to your `app.json` or `app.config.js`:
+   ```json
+   {
+     "expo": {
+       "plugins": [
+         "react-native-reanimated",
+         "react-native-keyboard-controller"
+       ]
+     }
+   }
+   ```
+
+3. Create a development build:
+   ```sh
+   npx expo prebuild
+   npx expo run:ios
+   # or
+   npx expo run:android
+   ```
+
 ### Peer Dependencies
 
 You need to install the following peer dependencies:
