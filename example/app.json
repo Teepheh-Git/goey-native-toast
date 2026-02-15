@@ -24,12 +24,6 @@
       "edgeToEdgeEnabled": true,
       "package": "goeynativetoast.example"
     },
-    "web": {
-      "favicon": "./assets/favicon.png"
-    },
-    "plugins": [
-      "react-native-reanimated",
-      "react-native-keyboard-controller"
-    ]
+    "plugins": ["react-native-reanimated", "react-native-keyboard-controller"]
   }
 }

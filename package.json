@@ -41,7 +41,7 @@
     "!**/.*"
   ],
   "scripts": {
-    "example": "yarn workspace goey-native-toast-example",
+    "example": "pnpm --filter goey-native-toast-example",
     "clean": "del-cli lib",
     "prepare": "bob build",
     "typecheck": "tsc",
