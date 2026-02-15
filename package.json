@@ -136,5 +136,23 @@
         }
       ]
     ]
+  },
+  "jest": {
+    "preset": "react-native",
+    "modulePathIgnorePatterns": [
+      "<rootDir>/example/node_modules",
+      "<rootDir>/lib/"
+    ],
+    "setupFilesAfterEnv": [
+      "<rootDir>/jest-setup.js"
+    ],
+    "transformIgnorePatterns": [
+      "node_modules/(?!.pnpm|((jest-)?react-native|@react-native(-community)?)|react-native-reanimated|react-native-gesture-handler|react-native-keyboard-controller|react-native-safe-area-context|react-native-svg)"
+    ]
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
   }
 }

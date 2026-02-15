@@ -1,5 +1,24 @@
 /* global jest */
 import "react-native-gesture-handler/jestSetup";
+import mockSafeAreaContext from "react-native-safe-area-context/jest/mock";
+
+jest.mock("react-native-safe-area-context", () => mockSafeAreaContext);
+
+jest.mock("react-native-keyboard-controller", () => {
+  return {
+    useAnimatedKeyboard: jest.fn(() => ({
+      height: { value: 0 },
+      progress: { value: 0 },
+    })),
+    KeyboardController: {
+      setInputMode: jest.fn(),
+      setDefaultMode: jest.fn(),
+      addListener: jest.fn(),
+      removeListener: jest.fn(),
+    },
+    KeyboardProvider: ({ children }) => children,
+  };
+});
 
 jest.mock("react-native-gesture-handler", () => {
   const View = require("react-native").View;
