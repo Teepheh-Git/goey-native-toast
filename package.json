@@ -71,6 +71,10 @@
     "url": "https://github.com/Teepheh-Git/goey-native-toast/issues"
   },
   "homepage": "https://github.com/Teepheh-Git/goey-native-toast#readme",
+  "engines": {
+    "node": ">= 18.0.0"
+  },
+  "packageManager": "pnpm@9.15.2",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },
