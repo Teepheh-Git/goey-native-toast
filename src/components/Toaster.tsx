@@ -5,7 +5,7 @@ import {
   type EdgeInsets,
 } from "react-native-safe-area-context";
 import Animated, { useAnimatedStyle } from "react-native-reanimated";
-import { useReanimatedKeyboardAnimation } from "react-native-keyboard-controller";
+import { useKeyboardAnimation } from "../core/keyboard";
 import type { ToasterProps, ToastMessage, ToastPosition } from "../types";
 import { useToastStore } from "../core/store";
 import { ToastItem } from "./ToastItem";
@@ -29,7 +29,7 @@ const ToastStack: React.FC<ToastStackProps> = ({
   solidColors,
   toastOptions,
 }) => {
-  const { height } = useReanimatedKeyboardAnimation();
+  const { height } = useKeyboardAnimation();
 
   const positionStyle = useMemo(() => {
     const [vertical, horizontal] = position.split("-");

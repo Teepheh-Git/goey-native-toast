@@ -59,36 +59,34 @@ pnpm add goey-native-toast
 This library relies on several peer dependencies that must be installed in your project:
 
 ```sh
-npx expo install react-native-reanimated react-native-gesture-handler react-native-svg react-native-safe-area-context react-native-keyboard-controller
+npx expo install react-native-reanimated react-native-gesture-handler react-native-svg react-native-safe-area-context
 ```
+
+**Optional:**
+```sh
+npx expo install react-native-keyboard-controller
+```
+(Recommended for keyboard avoidance support. If not installed, toasts will simply ignore keyboard state.)
 
 ### Expo Support
 
-This library is compatible with **Expo Development Builds** (Prebuild). It is **not** supported in Expo Go because it relies on `react-native-keyboard-controller`, which includes native code not present in the Expo Go client.
+✅ **Expo Snack & Expo Go**: Supported! (Keyboard avoidance will be disabled)
+✅ **Expo Development Builds**: Fully supported with keyboard avoidance.
 
-To use it with Expo:
+To enable full keyboard support in Development Builds:
 
-1.  **Add plugins to `app.json` / `app.config.js`**:
-
+1.  **Install the package**: `npx expo install react-native-keyboard-controller`
+2.  **Add plugin to `app.json`**:
     ```json
     {
       "expo": {
         "plugins": [
-          "react-native-reanimated",
           "react-native-keyboard-controller"
         ]
       }
     }
     ```
-
-2.  **Create a development build**:
-
-    ```sh
-    npx expo prebuild
-    npx expo run:ios
-    # or
-    npx expo run:android
-    ```
+3.  **Rebuild**: `npx expo prebuild` then run your app.
 
 ### Bare React Native
 

@@ -10,11 +10,23 @@ import {
   View,
 } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { KeyboardProvider } from "react-native-keyboard-controller";
 import {
   SafeAreaProvider,
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
+
+// Safe import for Expo Go / Web support
+let KeyboardProvider = ({ children }: { children: React.ReactNode }) => (
+  <>{children}</>
+);
+try {
+  const lib = require("react-native-keyboard-controller");
+  if (lib.KeyboardProvider) {
+    KeyboardProvider = lib.KeyboardProvider;
+  }
+} catch {
+  // Ignore
+}
 
 const POSITIONS: ToastPosition[] = [
   "top-left",
