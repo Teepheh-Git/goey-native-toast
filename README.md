@@ -20,6 +20,10 @@
     <a href="./LICENSE">
       <img src="https://img.shields.io/npm/l/goey-native-toast?style=flat-square" alt="license" />
     </a>
+    <br />
+    <a href="https://snack.expo.dev/@teepheh/goey-native-toast?platform=ios">
+      <img src="https://img.shields.io/badge/Try%20it%20on-Expo%20Snack-4630EB.svg?style=flat-square&logo=expo&logoColor=white" alt="Try it on Expo Snack" />
+    </a>
   </p>
 </div>
 
