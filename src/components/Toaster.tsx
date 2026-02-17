@@ -1,29 +1,36 @@
 import React, { useMemo } from "react";
 import { StyleSheet, Platform } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+  useSafeAreaInsets,
+  type EdgeInsets,
+} from "react-native-safe-area-context";
 import Animated, { useAnimatedStyle } from "react-native-reanimated";
-import { useAnimatedKeyboard } from "react-native-keyboard-controller";
-import type { ToasterProps } from "../types";
+import { useReanimatedKeyboardAnimation } from "react-native-keyboard-controller";
+import type { ToasterProps, ToastMessage, ToastPosition } from "../types";
 import { useToastStore } from "../core/store";
 import { ToastItem } from "./ToastItem";
 
-export const Toaster: React.FC<ToasterProps> = ({
-  position = "top-center",
-  toastOptions,
+interface ToastStackProps extends Omit<ToasterProps, "position"> {
+  position: ToastPosition;
+  toasts: ToastMessage[];
+  insets: EdgeInsets;
+}
+
+const ToastStack: React.FC<ToastStackProps> = ({
+  position,
+  toasts,
+  insets,
+  offset = 16,
   gutter = 8,
   containerStyle,
-  theme = "light",
-  richColors,
-  offset = 16,
   visibleToasts = 3,
   swipeToDismissDirection,
+  theme,
+  solidColors,
+  toastOptions,
 }) => {
-  const { toasts } = useToastStore();
-  const insets = useSafeAreaInsets();
-  const keyboard = useAnimatedKeyboard();
+  const { height } = useReanimatedKeyboardAnimation();
 
-  // Group toasts by position if we want to support multiple stacks (future)
-  // For now, assume global position from props
   const positionStyle = useMemo(() => {
     const [vertical, horizontal] = position.split("-");
     const isBottom = vertical === "bottom";
@@ -62,7 +69,7 @@ export const Toaster: React.FC<ToasterProps> = ({
 
     const isBottom = position.startsWith("bottom");
     return {
-      transform: [{ translateY: isBottom ? -keyboard.height.value : 0 }],
+      transform: [{ translateY: isBottom ? -height.value : 0 }],
     };
   });
 
@@ -75,7 +82,7 @@ export const Toaster: React.FC<ToasterProps> = ({
 
   return (
     <Animated.View
-      testID="toaster-container"
+      testID={`toaster-container-${position}`}
       style={[styles.container, positionStyle, containerStyle, keyboardStyle]}
       pointerEvents="box-none"
     >
@@ -90,10 +97,46 @@ export const Toaster: React.FC<ToasterProps> = ({
           isExpanded={false}
           swipeToDismissDirection={swipeToDismissDirection}
           theme={theme}
-          richColors={richColors || toast.richColors}
+          solidColors={solidColors || toast.solidColors}
         />
       ))}
     </Animated.View>
+  );
+};
+
+export const Toaster: React.FC<ToasterProps> = ({
+  position = "top-center",
+  ...props
+}) => {
+  const { toasts } = useToastStore();
+  const insets = useSafeAreaInsets();
+
+  const toastsByPosition = useMemo(() => {
+    const groups = new Map<ToastPosition, ToastMessage[]>();
+
+    toasts.forEach((t) => {
+      const pos = t.position || position;
+      if (!groups.has(pos)) {
+        groups.set(pos, []);
+      }
+      groups.get(pos)!.push(t);
+    });
+
+    return Array.from(groups.entries());
+  }, [toasts, position]);
+
+  return (
+    <>
+      {toastsByPosition.map(([pos, groupToasts]) => (
+        <ToastStack
+          key={pos}
+          position={pos}
+          toasts={groupToasts}
+          insets={insets}
+          {...props}
+        />
+      ))}
+    </>
   );
 };
 

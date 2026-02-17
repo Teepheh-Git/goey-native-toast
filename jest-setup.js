@@ -6,7 +6,7 @@ jest.mock("react-native-safe-area-context", () => mockSafeAreaContext);
 
 jest.mock("react-native-keyboard-controller", () => {
   return {
-    useAnimatedKeyboard: jest.fn(() => ({
+    useReanimatedKeyboardAnimation: jest.fn(() => ({
       height: { value: 0 },
       progress: { value: 0 },
     })),
@@ -32,6 +32,7 @@ jest.mock("react-native-gesture-handler", () => {
         runOnJS: jest.fn().mockReturnThis(),
         onStart: jest.fn().mockReturnThis(),
         onFinalize: jest.fn().mockReturnThis(),
+        enabled: jest.fn().mockReturnThis(),
       }),
     },
   };
@@ -79,16 +80,21 @@ jest.mock("react-native-reanimated", () => {
     createAnimatedComponent: (component) => component,
     useSharedValue: jest.fn((v) => ({ value: v })),
     useAnimatedStyle: jest.fn(() => ({})),
+    useAnimatedProps: jest.fn(() => ({})),
     useEvent: jest.fn(),
     useHandler: jest.fn(),
     withTiming: jest.fn((v) => v),
     withSpring: jest.fn((v) => v),
+    withDelay: jest.fn((_, v) => v),
+    interpolate: jest.fn((v) => v),
+    Extrapolation: { CLAMP: "clamp" },
     withSequence: jest.fn((...args) => args[args.length - 1]),
     runOnJS: jest.fn((fn) => fn),
     LinearTransition: {
       springify: jest.fn().mockReturnThis(),
       damping: jest.fn().mockReturnThis(),
       stiffness: jest.fn().mockReturnThis(),
+      duration: jest.fn().mockReturnThis(),
     },
     FadeIn: {
       duration: jest.fn().mockReturnThis(),

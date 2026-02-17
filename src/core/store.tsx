@@ -20,12 +20,20 @@ const addToast = (
     type,
     createdAt: Date.now(),
     duration: 3000,
+    autoDismiss: type !== "custom",
     ...config,
   };
 
   memoryToasts = [...memoryToasts, newToast];
   notifyListeners();
   return id;
+};
+
+const updateToast = (id: string, updates: Partial<ToastMessage>) => {
+  memoryToasts = memoryToasts.map((t) =>
+    t.id === id ? { ...t, ...updates } : t
+  );
+  notifyListeners();
 };
 
 export const toast = {
@@ -38,7 +46,48 @@ export const toast = {
   info: (message: string, config?: Partial<ToastConfig>) =>
     addToast(message, "info", config),
   custom: (message: string, config?: Partial<ToastConfig>) =>
-    addToast(message, "info", config),
+    addToast(message, "custom", config),
+  loading: (message: string, config?: Partial<ToastConfig>) =>
+    addToast(message, "loading", { ...config, duration: Infinity }),
+  promise: <T,>(
+    promise: Promise<T>,
+    data: {
+      loading: string;
+      success: string | ((data: T) => string);
+      error: string | ((error: any) => string);
+    },
+    config?: Partial<ToastConfig>
+  ) => {
+    const id = toast.loading(data.loading, { ...config, duration: Infinity });
+
+    promise
+      .then((response) => {
+        const successMessage =
+          typeof data.success === "function"
+            ? data.success(response)
+            : data.success;
+
+        updateToast(id, {
+          type: "success",
+          title: "Success",
+          description: successMessage,
+          duration: 3000,
+        });
+      })
+      .catch((error) => {
+        const errorMessage =
+          typeof data.error === "function" ? data.error(error) : data.error;
+
+        updateToast(id, {
+          type: "error",
+          title: "Error",
+          description: errorMessage,
+          duration: 3000,
+        });
+      });
+
+    return id;
+  },
   dismiss: (id?: string) => {
     if (id) {
       memoryToasts = memoryToasts.filter((t) => t.id !== id);
@@ -47,6 +96,8 @@ export const toast = {
     }
     notifyListeners();
   },
+  update: (id: string, updates: Partial<ToastMessage>) =>
+    updateToast(id, updates),
 };
 
 export const useToastStore = () => {

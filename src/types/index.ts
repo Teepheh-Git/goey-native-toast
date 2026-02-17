@@ -1,7 +1,13 @@
 import type { ReactNode } from "react";
 import type { ViewStyle, TextStyle } from "react-native";
 
-export type ToastType = "success" | "error" | "warning" | "info";
+export type ToastType =
+  | "success"
+  | "error"
+  | "warning"
+  | "info"
+  | "loading"
+  | "custom";
 
 export type ToastPosition =
   | "top-left"
@@ -17,7 +23,10 @@ export interface ToastConfig {
   duration?: number;
   position?: ToastPosition;
   icon?: ReactNode;
-  richColors?: boolean;
+  iconColor?: string;
+  backgroundColor?: string;
+  theme?: "light" | "dark" | "system";
+  solidColors?: boolean;
   className?: string;
   style?: ViewStyle;
   textStyle?: TextStyle;
@@ -33,7 +42,10 @@ export interface ToastConfig {
   };
   onDismiss?: () => void;
   onAutoClose?: () => void;
+  autoDismiss?: boolean;
   dismissible?: boolean;
+  expandWithSpring?: boolean;
+  customBody?: ReactNode;
 }
 
 export interface ToastMessage extends ToastConfig {
@@ -52,7 +64,7 @@ export interface ToasterProps {
   toastClassName?: string;
   icons?: Partial<Record<ToastType, ReactNode>>;
   theme?: "light" | "dark" | "system";
-  richColors?: boolean;
+  solidColors?: boolean;
   closeButton?: boolean;
   offset?: number;
   dir?: "ltr" | "rtl" | "auto";

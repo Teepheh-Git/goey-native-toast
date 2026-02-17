@@ -1,5 +1,5 @@
-import Svg, { Path, Circle, Polyline, Line } from "react-native-svg";
 import type { SvgProps } from "react-native-svg";
+import Svg, { Circle, Line, Path } from "react-native-svg";
 
 export const CheckCircle = (props: SvgProps) => (
   <Svg
@@ -13,8 +13,7 @@ export const CheckCircle = (props: SvgProps) => (
     strokeLinejoin="round"
     {...props}
   >
-    <Path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-    <Polyline points="22 4 12 14.01 9 11.01" />
+    <Path d="M20 6L9 17l-5-5" />
   </Svg>
 );
 

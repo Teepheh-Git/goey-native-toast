@@ -85,3 +85,7 @@ android/generated
 
 # React Native Nitro Modules
 nitrogen/
+
+# Example native projects
+example/ios/
+example/android/
