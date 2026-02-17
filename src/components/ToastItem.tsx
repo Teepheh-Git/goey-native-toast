@@ -18,8 +18,8 @@ import Animated, {
   withRepeat,
   withSpring,
   withTiming,
+  runOnJS,
 } from "react-native-reanimated";
-import { runOnJS } from "react-native-worklets";
 import { toast } from "../core/store";
 import type { SwipeDirection, ToastMessage } from "../types";
 import {

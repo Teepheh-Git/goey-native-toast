@@ -38,17 +38,6 @@ jest.mock("react-native-gesture-handler", () => {
   };
 });
 
-jest.mock(
-  "react-native-worklets",
-  () => ({
-    __esModule: true,
-    useWorklet: jest.fn(),
-    createSerializable: jest.fn((fn) => fn),
-    registerWorklet: jest.fn(),
-  }),
-  { virtual: true }
-);
-
 jest.mock("react-native-svg", () => {
   const React = require("react");
   const Svg = (props) => React.createElement("Svg", props, props.children);
