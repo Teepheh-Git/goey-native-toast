@@ -1,6 +1,6 @@
 {
   "name": "goey-native-toast",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "license": "MIT",
   "description": "A lightweight, highly customizable toast notification library for React Native and Expo. Smooth animations powered by Reanimated, swipe-to-dismiss gestures, keyboard-aware positioning, and beautiful built-in styles for success, error, warning, and info toasts.",
   "main": "./lib/commonjs/index.js",

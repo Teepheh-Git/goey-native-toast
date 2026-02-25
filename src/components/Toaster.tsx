@@ -42,20 +42,20 @@ const ToastStack: React.FC<ToastStackProps> = ({
         horizontal === "left"
           ? offset
           : horizontal === "center"
-            ? 0
-            : undefined,
+          ? 0
+          : undefined,
       right:
         horizontal === "right"
           ? offset
           : horizontal === "center"
-            ? 0
-            : undefined,
+          ? 0
+          : undefined,
       alignItems:
         horizontal === "center"
           ? "center"
           : horizontal === "left"
-            ? "flex-start"
-            : "flex-end",
+          ? "flex-start"
+          : "flex-end",
     } as const;
   }, [position, insets, offset]);
 
@@ -93,7 +93,10 @@ const ToastStack: React.FC<ToastStackProps> = ({
           index={index}
           position={position}
           visibleToasts={visibleToasts}
-          offset={gutter + (typeof toast.style?.height === 'number' ? toast.style.height : 60)}
+          offset={
+            gutter +
+            (typeof toast.style?.height === "number" ? toast.style.height : 60)
+          }
           isExpanded={false}
           swipeToDismissDirection={swipeToDismissDirection}
           theme={theme}

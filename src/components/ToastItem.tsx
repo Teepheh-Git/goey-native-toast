@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   StyleSheet,
   Text,
@@ -110,12 +116,18 @@ export const ToastItem: React.FC<ToastItemProps> = ({
 
   // Drive stack animation targets via useEffect
   useEffect(() => {
-    targetTranslateY.value = withSpring(
-      index * (isTop ? 1 : -1) * offset
-    );
+    targetTranslateY.value = withSpring(index * (isTop ? 1 : -1) * offset);
     targetScale.value = withSpring(isExpanded ? 1 : 1 - index * 0.05);
     targetOpacity.value = withTiming(isExpanded ? 1 : 1 - index * 0.1);
-  }, [index, isTop, offset, isExpanded, targetTranslateY, targetScale, targetOpacity]);
+  }, [
+    index,
+    isTop,
+    offset,
+    isExpanded,
+    targetTranslateY,
+    targetScale,
+    targetOpacity,
+  ]);
 
   // 0 = Pill, 1 = Expanded
   const expansionProgress = useSharedValue(0);
@@ -159,7 +171,7 @@ export const ToastItem: React.FC<ToastItemProps> = ({
       toast.dismiss(item.id);
       item.onDismiss?.();
     }, 600);
-  }, [item.id, item.onDismiss]);
+  }, [item]);
 
   const handleDismiss = useCallback(
     (forceImmediate = false) => {
@@ -184,14 +196,8 @@ export const ToastItem: React.FC<ToastItemProps> = ({
         }
       });
     },
-    [item.id, item.description, item.action, item.customBody, item.onDismiss, expansionProgress, handleDelayDismiss]
+    [item, expansionProgress, handleDelayDismiss]
   );
-
-  // Ref to always have latest handleDismiss for gesture handler without re-creating gesture
-  const handleDismissRef = useRef(handleDismiss);
-  useEffect(() => {
-    handleDismissRef.current = handleDismiss;
-  }, [handleDismiss]);
 
   // Auto-dismiss logic
   useEffect(() => {
@@ -202,8 +208,8 @@ export const ToastItem: React.FC<ToastItemProps> = ({
       }, item.duration);
       return () => clearTimeout(timer);
     }
-    return () => { };
-  }, [item.id, item.duration, item.onAutoClose, handleDismiss, item.autoDismiss]);
+    return () => {};
+  }, [item, handleDismiss]);
 
   const pan = useMemo(
     () =>
@@ -238,7 +244,7 @@ export const ToastItem: React.FC<ToastItemProps> = ({
             (swipeToDismissDirection === "right" &&
               event.translationX > DISMISS_THRESHOLD)
           ) {
-            runOnJS(handleDismissRef.current)(true);
+            runOnJS(handleDismiss)(true);
           } else {
             translationX.value = withSpring(0);
             translationY.value = withSpring(0);
@@ -251,6 +257,7 @@ export const ToastItem: React.FC<ToastItemProps> = ({
       translationX,
       translationY,
       item.dismissible,
+      handleDismiss,
     ]
   );
 
@@ -264,13 +271,16 @@ export const ToastItem: React.FC<ToastItemProps> = ({
   const iconColor = item.iconColor
     ? item.iconColor
     : solidColors
-      ? "#FFF"
-      : TYPE_COLORS[item.type as keyof typeof TYPE_COLORS];
+    ? "#FFF"
+    : TYPE_COLORS[item.type as keyof typeof TYPE_COLORS];
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
       transform: [
-        { translateY: targetTranslateY.value + translationY.value + initialOffset.value },
+        {
+          translateY:
+            targetTranslateY.value + translationY.value + initialOffset.value,
+        },
         { translateX: translationX.value },
         { scale: targetScale.value },
       ],
@@ -299,10 +309,10 @@ export const ToastItem: React.FC<ToastItemProps> = ({
   const backgroundColor = item.backgroundColor
     ? item.backgroundColor
     : solidColors
-      ? TYPE_COLORS[item.type as keyof typeof TYPE_COLORS]
-      : isDark
-        ? "#1F2937"
-        : "white";
+    ? TYPE_COLORS[item.type as keyof typeof TYPE_COLORS]
+    : isDark
+    ? "#1F2937"
+    : "white";
 
   const header = useMemo(
     () => (
@@ -428,12 +438,14 @@ export const ToastItem: React.FC<ToastItemProps> = ({
         exiting={exiting}
         style={[
           styles.container,
+          // eslint-disable-next-line react-native/no-inline-styles
           isTop ? { top: 0 } : { bottom: 0 },
           item.style,
           animatedStyle,
           // Hide toasts beyond visible limit
           index >= visibleToasts && styles.hidden,
           // Hide until ready to prevent FOUC
+          // eslint-disable-next-line react-native/no-inline-styles
           !isReady && { opacity: 0 },
         ]}
       >

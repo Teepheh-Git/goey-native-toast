@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import type { ToastPosition } from "goey-native-toast";
 import { Toaster, toast } from "goey-native-toast";
 import { useState } from "react";
@@ -223,6 +224,46 @@ const ExampleContent = () => {
                     duration: 3000,
                   });
                 }, 3000);
+              }}
+            />
+            <Button
+              theme={theme}
+              label="Dismiss Variants"
+              color="#111827"
+              onPress={() => {
+                let manualId = "";
+                manualId = toast.info("Tap action to dismiss me", {
+                  action: {
+                    label: "Dismiss",
+                    onClick: () => toast.dismiss(manualId),
+                  },
+                });
+
+                const autoId = toast.success("Will dismiss in 2s");
+                setTimeout(() => {
+                  toast.dismiss(autoId);
+                }, 2000);
+
+                toast.warning("Dismiss all in 4s");
+                setTimeout(() => {
+                  toast.dismiss();
+                }, 4000);
+              }}
+            />
+            <Button
+              theme={theme}
+              label="Manual Dismiss Only"
+              color="#0EA5E9"
+              onPress={() => {
+                let stickyId = "";
+                stickyId = toast.custom("Dismiss me to continue", {
+                  autoDismiss: false,
+                  duration: Infinity,
+                  action: {
+                    label: "Dismiss",
+                    onClick: () => toast.dismiss(stickyId),
+                  },
+                });
               }}
             />
             <Button

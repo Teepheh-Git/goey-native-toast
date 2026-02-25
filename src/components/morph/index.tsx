@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import React, { useState } from "react";
 import {
   Platform,
@@ -116,15 +117,15 @@ export default React.memo(function Morph({
       transform:
         alignment === "center"
           ? [
-            {
-              translateX: interpolate(
-                progress.value,
-                [0, 1],
-                [(totalBodyW - pillW) / 2, 0],
-                GEO_EXTRAPOLATE
-              ),
-            },
-          ]
+              {
+                translateX: interpolate(
+                  progress.value,
+                  [0, 1],
+                  [(totalBodyW - pillW) / 2, 0],
+                  GEO_EXTRAPOLATE
+                ),
+              },
+            ]
           : undefined,
     };
   });
