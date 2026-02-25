@@ -24,6 +24,6 @@
       "edgeToEdgeEnabled": true,
       "package": "goeynativetoast.example"
     },
-    "plugins": ["react-native-reanimated", "react-native-keyboard-controller"]
+    "plugins": []
   }
 }

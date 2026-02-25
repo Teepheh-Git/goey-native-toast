@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import {
-  Dimensions,
   Platform,
   StyleSheet,
   View,
+  useWindowDimensions,
   type ViewStyle,
 } from "react-native";
 import Animated, {
@@ -21,7 +21,6 @@ import {
 } from "./geometry";
 
 const AnimatedPath = Animated.createAnimatedComponent(Path);
-const SCREEN_WIDTH = Dimensions.get("window").width;
 
 const GEO_EXTRAPOLATE = {
   extrapolateLeft: Extrapolation.CLAMP,
@@ -46,13 +45,15 @@ export default React.memo(function Morph({
   header,
   children,
   progress,
-  maxWidth = SCREEN_WIDTH * 0.9,
+  maxWidth: maxWidthProp,
   alignment = "center",
   fill = "#FFFFFF",
   style,
   onReady,
   onBodyLayout,
 }: MorphProps) {
+  const { width: screenWidth } = useWindowDimensions();
+  const maxWidth = maxWidthProp ?? screenWidth * 0.9;
   const [pillDims, setPillDims] = useState({ width: 0, height: 0 });
   const [bodyDims, setBodyDims] = useState({ width: 0, height: 0 });
 
@@ -115,15 +116,15 @@ export default React.memo(function Morph({
       transform:
         alignment === "center"
           ? [
-              {
-                translateX: interpolate(
-                  progress.value,
-                  [0, 1],
-                  [(totalBodyW - pillW) / 2, 0],
-                  GEO_EXTRAPOLATE
-                ),
-              },
-            ]
+            {
+              translateX: interpolate(
+                progress.value,
+                [0, 1],
+                [(totalBodyW - pillW) / 2, 0],
+                GEO_EXTRAPOLATE
+              ),
+            },
+          ]
           : undefined,
     };
   });
@@ -297,7 +298,6 @@ export default React.memo(function Morph({
           style={{ maxWidth: maxWidth - PADDING_H * 2 }}
           onLayout={(e) => {
             setBodyDims(e.nativeEvent.layout);
-            onBodyLayout?.(e.nativeEvent.layout);
           }}
         >
           {children}
@@ -312,8 +312,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     opacity: 0,
     top: -1000,
-    width: SCREEN_WIDTH,
-    left: -SCREEN_WIDTH / 2,
+    width: "100%",
     alignItems: "center",
   },
 });

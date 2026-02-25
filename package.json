@@ -1,6 +1,6 @@
 {
   "name": "goey-native-toast",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "license": "MIT",
   "description": "A lightweight, animated, and customizable toast library for React Native",
   "main": "./lib/commonjs/index.js",

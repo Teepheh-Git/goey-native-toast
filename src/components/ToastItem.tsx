@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -61,6 +61,29 @@ const TYPE_ICONS = {
   custom: Info,
 };
 
+// Standalone component to keep loading spinner animation isolated from header memoization
+const AnimatedLoader: React.FC<{ color: string }> = React.memo(({ color }) => {
+  const spin = useSharedValue(0);
+
+  useEffect(() => {
+    spin.value = withRepeat(
+      withTiming(360, { duration: 1000, easing: Easing.linear }),
+      -1
+    );
+    return () => cancelAnimation(spin);
+  }, [spin]);
+
+  const animatedIconStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${spin.value}deg` }],
+  }));
+
+  return (
+    <Animated.View style={animatedIconStyle}>
+      <Loader color={color} />
+    </Animated.View>
+  );
+});
+
 export const ToastItem: React.FC<ToastItemProps> = ({
   toast: item,
   index,
@@ -79,30 +102,25 @@ export const ToastItem: React.FC<ToastItemProps> = ({
   const translationX = useSharedValue(0);
   const initialOffset = useSharedValue(isTop ? -300 : 300); // Start off-screen vertically
   const [isReady, setIsReady] = useState(false);
-  const spin = useSharedValue(0);
 
+  // Shared values for stack animation (driven by useEffect, not inside useAnimatedStyle)
+  const targetTranslateY = useSharedValue(0);
+  const targetScale = useSharedValue(1);
+  const targetOpacity = useSharedValue(1);
+
+  // Drive stack animation targets via useEffect
   useEffect(() => {
-    if (item.type === "loading") {
-      spin.value = withRepeat(
-        withTiming(360, { duration: 1000, easing: Easing.linear }),
-        -1
-      );
-    } else {
-      cancelAnimation(spin);
-      spin.value = 0;
-    }
-  }, [item.type, spin]);
-
-  const animatedIconStyle = useAnimatedStyle(() => {
-    return {
-      transform: [{ rotate: `${spin.value}deg` }],
-    };
-  });
+    targetTranslateY.value = withSpring(
+      index * (isTop ? 1 : -1) * offset
+    );
+    targetScale.value = withSpring(isExpanded ? 1 : 1 - index * 0.05);
+    targetOpacity.value = withTiming(isExpanded ? 1 : 1 - index * 0.1);
+  }, [index, isTop, offset, isExpanded, targetTranslateY, targetScale, targetOpacity]);
 
   // 0 = Pill, 1 = Expanded
   const expansionProgress = useSharedValue(0);
   const [showDescription, setShowDescription] = useState(false);
-  const [isExiting, setIsExiting] = useState(false);
+  const isExitingRef = useRef(false);
 
   // Expansion Logic
   const needsExpansionRef = React.useRef(false);
@@ -114,7 +132,7 @@ export const ToastItem: React.FC<ToastItemProps> = ({
     const timer = setTimeout(() => {
       needsExpansionRef.current = true;
       setShowDescription(true);
-    }, 600); // 100ms delay as per spec
+    }, 600);
 
     return () => clearTimeout(timer);
   }, [item.description, item.action, item.customBody]);
@@ -141,11 +159,11 @@ export const ToastItem: React.FC<ToastItemProps> = ({
       toast.dismiss(item.id);
       item.onDismiss?.();
     }, 600);
-  }, [item]);
+  }, [item.id, item.onDismiss]);
 
   const handleDismiss = useCallback(
     (forceImmediate = false) => {
-      if (isExiting) return;
+      if (isExitingRef.current) return;
 
       if (
         forceImmediate ||
@@ -156,7 +174,7 @@ export const ToastItem: React.FC<ToastItemProps> = ({
         return;
       }
 
-      setIsExiting(true);
+      isExitingRef.current = true;
 
       // Collapse first (Morph back to Pill)
       setShowDescription(false);
@@ -166,8 +184,14 @@ export const ToastItem: React.FC<ToastItemProps> = ({
         }
       });
     },
-    [item, isExiting, expansionProgress, handleDelayDismiss]
+    [item.id, item.description, item.action, item.customBody, item.onDismiss, expansionProgress, handleDelayDismiss]
   );
+
+  // Ref to always have latest handleDismiss for gesture handler without re-creating gesture
+  const handleDismissRef = useRef(handleDismiss);
+  useEffect(() => {
+    handleDismissRef.current = handleDismiss;
+  }, [handleDismiss]);
 
   // Auto-dismiss logic
   useEffect(() => {
@@ -178,8 +202,8 @@ export const ToastItem: React.FC<ToastItemProps> = ({
       }, item.duration);
       return () => clearTimeout(timer);
     }
-    return () => {};
-  }, [item, item.duration, item.onAutoClose, handleDismiss, item.autoDismiss]);
+    return () => { };
+  }, [item.id, item.duration, item.onAutoClose, handleDismiss, item.autoDismiss]);
 
   const pan = useMemo(
     () =>
@@ -214,7 +238,7 @@ export const ToastItem: React.FC<ToastItemProps> = ({
             (swipeToDismissDirection === "right" &&
               event.translationX > DISMISS_THRESHOLD)
           ) {
-            runOnJS(handleDismiss)(true);
+            runOnJS(handleDismissRef.current)(true);
           } else {
             translationX.value = withSpring(0);
             translationY.value = withSpring(0);
@@ -222,7 +246,6 @@ export const ToastItem: React.FC<ToastItemProps> = ({
         }),
     [
       DRAG_LIMIT,
-      handleDismiss,
       isTop,
       swipeToDismissDirection,
       translationX,
@@ -241,29 +264,19 @@ export const ToastItem: React.FC<ToastItemProps> = ({
   const iconColor = item.iconColor
     ? item.iconColor
     : solidColors
-    ? "#FFF"
-    : TYPE_COLORS[item.type as keyof typeof TYPE_COLORS];
+      ? "#FFF"
+      : TYPE_COLORS[item.type as keyof typeof TYPE_COLORS];
 
   const animatedStyle = useAnimatedStyle(() => {
-    // Stack effect logic
-    const translateY =
-      index * (isTop ? 1 : -1) * offset +
-      translationY.value +
-      initialOffset.value;
-    const translateX = translationX.value;
-    const scale = 1 - index * 0.05;
-    const opacity = 1 - index * 0.1;
-
     return {
       transform: [
-        { translateY: withSpring(translateY) },
-        { translateX: withSpring(translateX) },
-        { scale: withSpring(isExpanded ? 1 : scale) },
+        { translateY: targetTranslateY.value + translationY.value + initialOffset.value },
+        { translateX: translationX.value },
+        { scale: targetScale.value },
       ],
-      opacity: withTiming(isExpanded ? 1 : opacity),
+      opacity: targetOpacity.value,
       zIndex: visibleToasts - index,
-      // Add shadow for better depth perception in stack
-      shadowOpacity: withTiming(index === 0 ? 0.1 : 0),
+      shadowOpacity: index === 0 ? 0.1 : 0,
     };
   });
 
@@ -286,20 +299,17 @@ export const ToastItem: React.FC<ToastItemProps> = ({
   const backgroundColor = item.backgroundColor
     ? item.backgroundColor
     : solidColors
-    ? TYPE_COLORS[item.type as keyof typeof TYPE_COLORS]
-    : isDark
-    ? "#1F2937"
-    : "white";
+      ? TYPE_COLORS[item.type as keyof typeof TYPE_COLORS]
+      : isDark
+        ? "#1F2937"
+        : "white";
 
   const header = useMemo(
     () => (
       <View style={styles.headerRow}>
         <View style={styles.iconContainer}>
-          {/* @ts-ignore - Valid React Node */}
           {item.type === "loading" ? (
-            <Animated.View style={animatedIconStyle}>
-              <Loader color={iconColor} />
-            </Animated.View>
+            <AnimatedLoader color={iconColor} />
           ) : (
             <Icon color={iconColor} />
           )}
@@ -333,7 +343,6 @@ export const ToastItem: React.FC<ToastItemProps> = ({
       solidColors,
       iconColor,
       isDark,
-      animatedIconStyle,
       Icon,
     ]
   );

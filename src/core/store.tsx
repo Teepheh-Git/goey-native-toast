@@ -72,6 +72,7 @@ export const toast = {
           title: "Success",
           description: successMessage,
           duration: 3000,
+          autoDismiss: true,
         });
       })
       .catch((error) => {
@@ -83,6 +84,7 @@ export const toast = {
           title: "Error",
           description: errorMessage,
           duration: 3000,
+          autoDismiss: true,
         });
       });
 
